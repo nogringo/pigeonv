@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
@@ -69,11 +69,14 @@
 </head>
 
 <body>
-  <textarea id="myTextarea" placeholder="Tapez votre texte ici..."></textarea>
-  <button onclick="copyToClipboard()">Copier le texte</button>
-  <button onclick="changeRoom()">Changer de salle</button>
+  <textarea id="myTextarea" placeholder="Type your text here..."></textarea>
+  <button onclick="copyToClipboard()">Copy Text</button>
+  <button onclick="changeRoom()">Change Room</button>
 
   <script>
+    // TODO create the readme.md
+    // TODO add room id on the UI
+
     const appName = 'pigeonv';
     const textarea = document.getElementById("myTextarea");
 
@@ -103,8 +106,8 @@
     }
 
     function addRandomStringToUrl() {
-      const randomString = generateRandomString(8); // Chaine aléatoire de 8 caractères
-      const currentUrl = window.location.href.split('?')[0]; // Retirer les éventuels paramètres existants
+      const randomString = generateRandomString(8); // Random string of 8 characters
+      const currentUrl = window.location.href.split('?')[0]; // Remove any existing parameters
       const newUrl = `${currentUrl}?r=${randomString}`;
       window.history.replaceState({}, '', newUrl);
     }
@@ -118,21 +121,21 @@
       textarea.select();
       textarea.setSelectionRange(0, 99999); // For mobile devices
       document.execCommand("copy");
-      alert("Le texte a été copié !");
+      alert("Text has been copied!");
     }
 
     async function hashString(string) {
-      // Convertir la chaîne en Uint8Array
+      // Convert the string to Uint8Array
       const encoder = new TextEncoder();
       const data = encoder.encode(string);
 
-      // Hacher les données en utilisant SHA-256
+      // Hash the data using SHA-256
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
 
-      // Convertir le buffer en tableau d'octets
+      // Convert the buffer to byte array
       const hashArray = Array.from(new Uint8Array(hashBuffer));
 
-      // Convertir le tableau d'octets en chaîne hexadécimale
+      // Convert the byte array to hexadecimal string
       const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
 
       return hashHex;
