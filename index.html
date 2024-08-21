@@ -24,7 +24,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(to bottom, #FF7E5F, #FEB47B);
+      background: linear-gradient(to bottom, var(--dynamic-color-1), var(--dynamic-color-2));
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
@@ -83,9 +83,6 @@
   <button onclick="changeRoom()">Change Room</button>
 
   <script>
-    // TODO create the readme.md
-    // TODO add room id on the UI
-
     const appName = 'pigeonv';
     const textarea = document.getElementById("myTextarea");
 
@@ -134,42 +131,40 @@
     }
 
     async function hashString(string) {
-      // Convert the string to Uint8Array
       const encoder = new TextEncoder();
       const data = encoder.encode(string);
-
-      // Hash the data using SHA-256
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-
-      // Convert the buffer to byte array
       const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-      // Convert the byte array to hexadecimal string
       const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-
       return hashHex;
     }
 
-    window.onload = async function () {
-      // Get the 'r' parameter value
-      let rValue = getUrlParameter('r');
+    function generateColorFromHash(hash) {
+      const color1 = `#${hash.slice(0, 6)}`;
+      const color2 = `#${hash.slice(6, 12)}`;
+      return { color1, color2 };
+    }
 
-      // Check if 'r' parameter exists in the URL
+    window.onload = async function () {
+      let rValue = getUrlParameter('r');
       if (!rValue) {
         addRandomStringToUrl();
         rValue = getUrlParameter('r');
       }
 
       const rHashed = await hashString(rValue);
-      const textareaRef = gun.get(rHashed); // Create unique reference
+      const { color1, color2 } = generateColorFromHash(rHashed);
 
-      // Update Gun with textarea content
+      document.documentElement.style.setProperty('--dynamic-color-1', color1);
+      document.documentElement.style.setProperty('--dynamic-color-2', color2);
+
+      const textareaRef = gun.get(rHashed);
+
       textarea.addEventListener('input', async () => {
         const text = await SEA.encrypt(textarea.value, rValue);
         textareaRef.put({ text: text });
       });
 
-      // Sync textarea with Gun
       textareaRef.on(async data => {
         const text = await SEA.decrypt(data.text, rValue);
         if (text !== textarea.value) {
