@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pigeon V</title>
   <style>
-    html, body {
+    html,
+    body {
       height: 100%;
       width: 100%;
       margin: 0;
@@ -64,15 +65,17 @@
   </style>
   <!-- Include Gun.js -->
   <script src="https://cdn.jsdelivr.net/npm/gun/gun.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
 </head>
 
 <body>
   <textarea id="myTextarea" placeholder="Tapez votre texte ici..."></textarea>
   <button onclick="copyToClipboard()">Copier le texte</button>
-  <button onclick="changeParameterR()">Changer le paramètre r</button>
+  <button onclick="changeRoom()">Changer de salle</button>
 
   <script>
     const appName = 'pigeonv';
+    const textarea = document.getElementById("myTextarea");
 
     // Initialize Gun
     const gun = Gun([
@@ -106,36 +109,52 @@
       window.history.replaceState({}, '', newUrl);
     }
 
-    function changeParameterR() {
+    function changeRoom() {
       addRandomStringToUrl();
       location.reload(); // Reload the page to apply the new 'r' value
     }
 
-    window.onload = function () {
+    function copyToClipboard() {
+      textarea.select();
+      textarea.setSelectionRange(0, 99999); // For mobile devices
+      document.execCommand("copy");
+      alert("Le texte a été copié !");
+    }
+
+    async function hashString(string) {
+      // Convertir la chaîne en Uint8Array
+      const encoder = new TextEncoder();
+      const data = encoder.encode(string);
+
+      // Hacher les données en utilisant SHA-256
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+      // Convertir le buffer en tableau d'octets
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+      // Convertir le tableau d'octets en chaîne hexadécimale
+      const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+      return hashHex;
+    }
+
+    window.onload = async function () {
       // Get the 'r' parameter value
       const rValue = getUrlParameter('r');
-      const textareaRef = gun.get(`${appName}-${rValue}`); // Create unique reference
-
-      // Get textarea element
-      const textarea = document.getElementById("myTextarea");
-
-      // Function to copy text to clipboard
-      function copyToClipboard() {
-        textarea.select();
-        textarea.setSelectionRange(0, 99999); // For mobile devices
-        document.execCommand("copy");
-        alert("Le texte a été copié !");
-      }
+      const rHashed = await hashString(rValue);
+      const textareaRef = gun.get(rHashed); // Create unique reference
 
       // Update Gun with textarea content
-      textarea.addEventListener('input', () => {
-        textareaRef.put({ text: textarea.value });
+      textarea.addEventListener('input', async () => {
+        const text = await SEA.encrypt(textarea.value, rValue);
+        textareaRef.put({ text: text });
       });
 
       // Sync textarea with Gun
-      textareaRef.on(data => {
-        if (data && data.text !== textarea.value) {
-          textarea.value = data.text;
+      textareaRef.on(async data => {
+        const text = await SEA.decrypt(data.text, rValue);
+        if (text !== textarea.value) {
+          textarea.value = text;
         }
       });
 
