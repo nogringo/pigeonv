@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pigeon V</title>
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom, #FF7E5F, #FEB47B);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    textarea {
+      width: 60%;
+      height: 250px;
+      padding: 20px;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      font-size: 18px;
+      color: #333;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      resize: none;
+      outline: none;
+    }
+
+    textarea:focus {
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05);
+    }
+
+    ::placeholder {
+      color: #888;
+      opacity: 0.8;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background-color: #FF7E5F;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #FEB47B;
+      transform: scale(1.05);
+    }
+  </style>
+  <!-- Include Gun.js -->
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.min.js"></script>
+</head>
+
+<body>
+  <textarea id="myTextarea" placeholder="Tapez votre texte ici..."></textarea>
+  <button onclick="copyToClipboard()">Copier le texte</button>
+  <button onclick="changeParameterR()">Changer le paramètre r</button>
+
+  <script>
+    const appName = 'pigeonv';
+
+    // Initialize Gun
+    const gun = Gun([
+      'https://gun-manhattan.herokuapp.com/gun',
+      'https://try.axe.eco/gun',
+      'https://test.era.eco/gun',
+      'https://peer.wallie.io/gun',
+    ]);
+
+    // Extract the 'r' parameter from the URL
+    function getUrlParameter(name) {
+      const regex = new RegExp('[?&]' + name + '=([^&#]*)');
+      const results = regex.exec(window.location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    function generateRandomString(length) {
+      const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789';
+      let result = '';
+      const charactersLength = characters.length;
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
+
+    function addRandomStringToUrl() {
+      const randomString = generateRandomString(8); // Chaine aléatoire de 8 caractères
+      const currentUrl = window.location.href.split('?')[0]; // Retirer les éventuels paramètres existants
+      const newUrl = `${currentUrl}?r=${randomString}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+
+    function changeParameterR() {
+      addRandomStringToUrl();
+      location.reload(); // Reload the page to apply the new 'r' value
+    }
+
+    window.onload = function () {
+      // Get the 'r' parameter value
+      const rValue = getUrlParameter('r');
+      const textareaRef = gun.get(`${appName}-${rValue}`); // Create unique reference
+
+      // Get textarea element
+      const textarea = document.getElementById("myTextarea");
+
+      // Function to copy text to clipboard
+      function copyToClipboard() {
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand("copy");
+        alert("Le texte a été copié !");
+      }
+
+      // Update Gun with textarea content
+      textarea.addEventListener('input', () => {
+        textareaRef.put({ text: textarea.value });
+      });
+
+      // Sync textarea with Gun
+      textareaRef.on(data => {
+        if (data && data.text !== textarea.value) {
+          textarea.value = data.text;
+        }
+      });
+
+      // Check if 'r' parameter exists in the URL
+      if (!rValue) {
+        addRandomStringToUrl();
+      }
+    };
+  </script>
+</body>
+
+</html>
