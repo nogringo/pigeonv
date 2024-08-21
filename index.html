@@ -152,7 +152,14 @@
 
     window.onload = async function () {
       // Get the 'r' parameter value
-      const rValue = getUrlParameter('r');
+      let rValue = getUrlParameter('r');
+
+      // Check if 'r' parameter exists in the URL
+      if (!rValue) {
+        addRandomStringToUrl();
+        rValue = getUrlParameter('r');
+      }
+
       const rHashed = await hashString(rValue);
       const textareaRef = gun.get(rHashed); // Create unique reference
 
@@ -169,11 +176,6 @@
           textarea.value = text;
         }
       });
-
-      // Check if 'r' parameter exists in the URL
-      if (!rValue) {
-        addRandomStringToUrl();
-      }
     };
   </script>
 </body>
