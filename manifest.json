@@ -1,0 +1,40 @@
+{
+  "name": "Pigeon V",
+  "short_name": "Pigeon V",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ff7c84",
+  "theme_color": "#ff7c84",
+  "description": "Pigeon V is a lightweight app for syncing text across your devices with end-to-end encryption",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icon/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "16x16 32x32"
+    },
+    {
+      "src": "./icon/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./icon/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "./icon/icon-192-maskable.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon/icon-512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}
