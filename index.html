@@ -5,8 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pigeon V</title>
-  <link rel="icon" href="./icon/favicon.ico" sizes="any">
-  <link rel="apple-touch-icon" href="./icon/apple-touch-icon.png">
+
+  <meta name="theme-color" content="#ff7c84">
+  <link rel="icon" href="icon/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
 
   <!-- SEO Meta Tags -->
   <meta name="description"
@@ -19,15 +22,15 @@
   <meta property="og:description"
     content="Pigeon V is a lightweight app for syncing text across your devices. Enjoy seamless text sharing with end-to-end encryption and real-time updates without needing an account.">
 
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css">
   <!-- Include Gun.js -->
-  <script src="./gun/gun.min.js"></script>
-  <script src="./gun/sea.js"></script>
+  <script src="gun/gun.min.js"></script>
+  <script src="gun/sea.js"></script>
 </head>
 
 <body>
   <div class="header">
-    <img src="./icon/logo.svg" alt="Pigeon V Logo" class="logo">
+    <img src="icon/logo.svg" alt="Pigeon V Logo" class="logo">
     <h1 class="app-name">Pigeon V</h1>
   </div>
   <textarea id="myTextarea" placeholder="Type your text here..."></textarea>
@@ -41,7 +44,18 @@
       href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
   </div>
 
-  <script src="./index.js"></script>
+  <script src="index.js"></script>
+
+  <script>
+    // Register the service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+      }).catch(function (error) {
+        console.log('Service Worker registration failed:', error);
+      });
+    }
+  </script>
 </body>
 
 </html>
